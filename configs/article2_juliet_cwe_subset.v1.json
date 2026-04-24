@@ -1,0 +1,25 @@
+{
+  "name": "article2_juliet_cwe_subset_v1",
+  "description": "Juliet (v1.3) CWE shortlist chosen from prepared testcases scan: include CWEs with min(good,bad) >= 80 in juliet_normalized.jsonl (10–20 CWE style control).",
+  "cwe_ids": [
+    "CWE-122",
+    "CWE-78",
+    "CWE-762",
+    "CWE-121",
+    "CWE-134",
+    "CWE-190",
+    "CWE-36",
+    "CWE-23",
+    "CWE-127",
+    "CWE-124",
+    "CWE-590",
+    "CWE-191",
+    "CWE-401",
+    "CWE-126",
+    "CWE-195",
+    "CWE-194",
+    "CWE-415",
+    "CWE-789",
+    "CWE-690"
+  ]
+}

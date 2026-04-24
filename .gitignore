@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Local caches / temporary runtime data
+work/
+workspace/
+
+# Large/generated datasets (rebuild with scripts)
+datasets/derived/
+datasets/juliet/raw/
+datasets/juliet/prepared/
+datasets/primevul/raw/
+datasets/primevul/prepared/
+
+# Intermediate / historical run trees (keep compact merged outputs under results/)
+results_inference*/
+
+# Local paper-writing archive (not for public release)
+archive/
