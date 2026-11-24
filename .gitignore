@@ -1,21 +1,99 @@
-# Python
+# Phd-A2 — GitHub worktree only (scripts, configs, docs, tests; no research payload)
+# See docs/GITHUB_MD_MANIFEST.md and docs/REPO_PUBLICATION_AUDIT_V6.md
+
+# --- Python / venv ---
 __pycache__/
 *.pyc
 .venv/
 
-# Local caches / temporary runtime data
+# --- Coordination, IDE, secrets ---
+local/
+archive/
 work/
 workspace/
+.cursor/
+.vscode/
+.env*
+!.env.example
 
-# Large/generated datasets (rebuild with scripts)
-datasets/derived/
-datasets/juliet/raw/
-datasets/juliet/prepared/
-datasets/primevul/raw/
-datasets/primevul/prepared/
+# --- Repo-root runtime junk (never commit) ---
+*.snap
+*.assert
+ACTUAL_WORKER_CONTRACT.json
+chatgpt-desktop-client_*
 
-# Intermediate / historical run trees (keep compact merged outputs under results/)
+# --- Datasets (rebuild via scripts; .gitkeep only) ---
+datasets/**
+!datasets/.gitkeep
+
+# --- Manifests (frozen queues are local/WD only) ---
+manifests/**
+!manifests/final_inference/
+manifests/final_inference/**
+!manifests/final_inference/README.md
+
+# --- Results (inference, article2, diagnostics, pilots — all local/WD) ---
+results/
+
+# --- SQLite / WAL sidecars ---
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+
+# --- Legacy inference run dir names ---
 results_inference*/
 
-# Local paper-writing archive (not for public release)
-archive/
+# --- Internal markdown (not for public GitHub) ---
+docs/ARTICLE2_FOLDER_STRUCTURE_GITHUB_WD.md
+docs/REPO_COMMIT_PLAN_POST_SELECTION.md
+docs/LLM_SUMMARY_RUNBOOK.md
+configs/CURSOR_*.md
+
+# --- Qwen models / lanes (local, WD, or legacy remote only) ---
+**/*[Qq][Ww][Ee][Nn]*
+results/**/qwen*/
+results/**/qwen35/
+
+# --- Article2 lane ops, WD tools, pilots (not public reproduction) ---
+scripts/article2/
+scripts/validation/
+scripts/inference/
+scripts/evaluation/export_matrix_individual.py
+scripts/representations/prepare_joern_v2_micropilot_snippets.py
+scripts/representations/joern_v2_micropilot_session.sc
+
+# --- Dataset scripts: core download/prepare only (see README) ---
+scripts/datasets/**
+!scripts/datasets/
+!scripts/datasets/__init__.py
+!scripts/datasets/_common.py
+!scripts/datasets/dataset_stats.py
+!scripts/datasets/download_juliet.py
+!scripts/datasets/download_primevul.py
+!scripts/datasets/filter_normalized_jsonl.py
+!scripts/datasets/prepare_juliet.py
+!scripts/datasets/prepare_primevul.py
+
+
+# --- Article2 / factual prompts (local only) ---
+configs/ARTICLE2_*
+configs/article2_*
+configs/*factual*
+configs/*Factual*
+
+# --- Config stubs not used by README reproduction ---
+configs/**
+!configs/article2_juliet_cwe_subset.v1.json
+!configs/article2_primevul_cwe_subset.v1.json
+
+# --- Docs: optional; keep only maintainer manifest ---
+docs/**
+!docs/GITHUB_PY_MANIFEST.md
+
+# --- Tests / manifest placeholders (README is enough) ---
+tests/
+manifests/
+
+# --- Operator / IDE (never commit) ---
+.cursorignore
+local_resume_all*.json

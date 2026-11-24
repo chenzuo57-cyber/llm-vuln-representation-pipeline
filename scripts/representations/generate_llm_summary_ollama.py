@@ -10,16 +10,16 @@ from pathlib import Path
 
 
 DEFAULT_PROMPT = """You are a static-analysis summarizer.
-Summarize the given code in exactly 5 bullet lines.
+Summarize the given code in exactly 4 bullet lines.
 Each line must start with "- ".
 Use this fixed schema:
 - Purpose:
 - Source/Input:
 - Key data/control flow:
 - Risky operations/APIs:
-- Vulnerability hypothesis:
+
 Rules:
-- Use exactly those 5 labels in that order.
+- Use exactly those 4 labels in that order.
 - Keep summaries neutral and descriptive (no final security verdict).
 - Do not claim CWE IDs or definitive vulnerability conclusions.
 - Mention concrete function/API/variable names from the code.
@@ -28,7 +28,7 @@ Rules:
 - If information is missing, say "Unknown from visible snippet." and do not hallucinate.
 - Keep each bullet to one concise sentence (two short clauses max if needed for accuracy).
 - Do not include <think> or hidden reasoning.
-- Output only the 5 bullets, nothing else.
+- Output only the 4 bullets, nothing else.
 """
 
 

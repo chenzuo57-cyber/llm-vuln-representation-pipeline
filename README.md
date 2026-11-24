@@ -179,7 +179,7 @@ Expected output naming convention:
 All evaluation scripts use Ollama HTTP `/api/generate`.
 
 - Local default: `http://127.0.0.1:11434`
-- Remote example: `http://192.168.3.43:11434`
+- Remote example: `http://<ollama-host>:11434`
 
 Quick connectivity check:
 
@@ -190,7 +190,7 @@ curl -s http://127.0.0.1:11434/api/tags
 Or remote:
 
 ```bash
-curl -s http://192.168.3.43:11434/api/tags
+curl -s "http://<ollama-host>:11434/api/tags"
 ```
 
 Set once per session:
@@ -250,6 +250,53 @@ export ALLOW_DEPRECATED_V1_PROMPT=1
 - Record prompt profile (`detector_prompt_v2_risk_first`)
 - Keep per-run results in separate folders to avoid overwrite
 - Recompute merged metrics after any targeted rerun
+
+## Article 2 — five test datasets (acquisition and filtering)
+
+Large corpora and frozen evaluation JSONL are **not** stored in this repository (size and third-party licenses). Use the steps below to download upstream data, understand our filters, and verify the **test splits** we use in Article 2.
+
+### Summary (evaluation test splits)
+
+| Dataset | Split file (local path after build) | Rows | SHA-256 |
+|---------|-----------------------------------|-----:|---------|
+| Juliet | `datasets/juliet/prepared/juliet_article2_subset.jsonl` | 8,410 | `8773e985e64c773d619b75bd1f09ed1361e4dea357424321f73cfce0e9d0a198` |
+| PrimeVul (official **test** only) | `datasets/primevul/prepared/primevul_test_article2_subset.jsonl` | 15,668 | `80deb52ba5ae625d4f561f991cf10353b519c9f9743908d7bf6c1627013dda1b` |
+| MegaVul | `datasets/benchmarks/prepared/frozen_v1/megavul_frozen_v1_prepared.jsonl` | 20,000 | `5f1616eb9a6a738a86952aec01b21d5d04edcd6261e5adddacbdb4af092d5169` |
+| RDiverseVul | `datasets/benchmarks/prepared/frozen_v1/rdiversevul_frozen_v1_prepared.jsonl` | 20,000 | `9c8d76ccca3d3150051fc5d1139c8bea43e496b3ddaad96cc71ceadfee47c219` |
+| ReposVul (competition **test**) | `datasets/benchmarks/prepared/frozen_v1/reposvul_test_frozen_v1_prepared.jsonl` | 15,981 | `d51b5e6184ec9a20e13ea48f34bad9c1df402878061545c409cc5cb4a95de94b` |
+
+Juliet and PrimeVul splits are produced with the commands in [§1 Download and Prepare Datasets](#1-download-and-prepare-datasets) and the CWE configs under `configs/`. The three extension splits are built locally (see below); **contact the authors or use the paper supplementary archive** if you need the frozen JSONL without re-running the full pipeline.
+
+### Download upstream sources
+
+| Dataset | Where to download | Place on disk (default paths used by our tooling) |
+|---------|-------------------|---------------------------------------------------|
+| **PrimeVul** | `python3 scripts/datasets/download_primevul.py` | `datasets/primevul/` (then `prepare_primevul.py`) |
+| **Juliet** | `python3 scripts/datasets/download_juliet.py` | `datasets/juliet/` (then `prepare_juliet.py`) |
+| **MegaVul** | [Icyrockton/MegaVul](https://github.com/Icyrockton/MegaVul) — obtain `megavul_simple.json` from the project’s linked release / cloud drive (see their `SPECIFICATION.md`) | Any path; our profiling defaults to `~/Downloads/megavul_simple.json` or pass `--megavul` |
+| **RDiverseVul** | Zenodo [10.5281/zenodo.15051277](https://doi.org/10.5281/zenodo.15051277) — file `RDiverseVul.json` (~493 MB; MD5 `48965ed417cf1ec9389e010a91412f7f`) | `datasets/benchmarks/rdiversevul/RDiverseVul.json` |
+| **ReposVul** | [Eshe0922/ReposVul](https://github.com/Eshe0922/ReposVul) — competition C/C++ archive (Google Drive link in that README) | Extract so the official test JSONL is at `datasets/benchmarks/reposvul/competition/random/test_c_cpp_repository2.jsonl` |
+
+Check each dataset’s license before redistributing code snippets or derived manifests.
+
+### Screening and test-set construction (Article 2)
+
+Processing order (implementation lives under `scripts/datasets/` in the maintainer tree; outputs are local):
+
+1. **Normalize code** — whitespace-normalized `norm_hash` per function/snippet (same idea as Juliet/PrimeVul dedup).
+2. **Cross-benchmark dedup** — build candidate pools for MegaVul, RDiverseVul, and ReposVul test; assign duplicate hashes to a single **owner** with priority **ReposVul test → RDiverseVul → MegaVul** (`cross_benchmark_dedup.py` → `results/benchmark_profile/cross_dedup/`).
+3. **Cross-dataset label conflicts (V6)** — globally drop **896** hashes that appear with disagreeing labels across datasets before evaluation sampling.
+4. **CWE shortlist (strategy B)** — keep CWEs with at least **100 vulnerable** training/evaluation-eligible rows in that dataset; for RDiverseVul also **drop rows whose primary CWE is unknown/missing** (strategy B, not B+).
+5. **ReposVul** — use the full eligible official **test** split after steps 2–3 (**15,981** rows).
+6. **MegaVul & RDiverseVul** — stratified sample **20,000** rows each with seed **`20261012`**, strata `(label, primary_cwe)`, proportional allocation (`build_proposed_evaluation_manifests.py` policy `researcher_approved_2026-10-12`).
+
+MegaVul code field: `func_before` when `is_vul` else `func`; label = `is_vul` ([MegaVul spec](https://github.com/Icyrockton/MegaVul/blob/main/SPECIFICATION.md)).
+
+### Obtain our frozen test JSONL
+
+- **Reproduce:** run the pipeline above on your downloaded upstream files; materialize prepared splits under `datasets/benchmarks/prepared/frozen_v1/` and compare SHA-256 to the table.
+- **Without rebuilding:** use the checksums in the table to verify copies from the **paper supplementary package** or a data release published with the Article 2 preprint (not committed here).
+- **Status:** Juliet/PrimeVul Article 2 subsets and published 7×2 pilot results are **frozen**; extension benchmarks are **defined and checksum’d** as above — full 7×2 on MegaVul/RDiverseVul/ReposVul may still be in progress.
 
 ## Notes
 
