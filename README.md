@@ -2,11 +2,16 @@
 
 This repository provides an end-to-end pipeline to reproduce vulnerability-detection experiments across multiple code representations and LLM backends.
 
+**Article 2 evaluation** uses **five** test corpora (Juliet, PrimeVul, MegaVul, RDiverseVul, ReposVul competition test). This git repo ships scripts for **Juliet + PrimeVul**; extension benchmarks are downloaded locally and built into frozen splits (checksums and links in [Article 2 — five test datasets](#article-2--five-test-datasets-acquisition-and-filtering)).
+
 ## Scope
 
-- Datasets:
-  - PrimeVul (primary)
-  - Juliet v1.3 C/C++ (secondary)
+- Datasets (Article 2 test splits — **79,059** rows total across five JSONL; not bundled in git):
+  - **PrimeVul** — primary; official **test** CWE subset (**15,668** rows)
+  - **Juliet** v1.3 C/C++ — secondary Article 2 subset (**8,410** rows)
+  - **MegaVul** — extension; stratified **20,000**-row frozen split (seed `20261012`)
+  - **RDiverseVul** — extension; stratified **20,000**-row frozen split (same seed)
+  - **ReposVul** — competition C/C++ **test**; **15,981** rows after cross-benchmark filters
 - Representations:
   - `rawcode`, `ast`, `cfg`, `dfg`, `cpg`, `slice`, `llm_summary`
 - Evaluation:
@@ -21,11 +26,13 @@ This repository provides an end-to-end pipeline to reproduce vulnerability-detec
 - `configs/`: dataset subset configs (CWE allowlists)
 - `results/`: compact merged outputs/metrics intended for sharing
 - `datasets/`: generated data artifacts (typically large; usually ignored in git)
+  - `juliet/`, `primevul/` — built via tracked download/prepare scripts
+  - `benchmarks/` — MegaVul, RDiverseVul, ReposVul upstream + `prepared/frozen_v1/` Article 2 splits (local only)
 - `work/`, `workspace/`: transient Joern/runtime artifacts
 
 ## Folder and File Structure Guide
 
-This section shows the practical structure to keep for a reusable public repo.
+This section shows the **minimal git surface** for Juliet + PrimeVul reproduction. Article 2 adds three more benchmarks (download + frozen JSONL); see [five test datasets](#article-2--five-test-datasets-acquisition-and-filtering).
 
 ```text
 Phd-A2/
@@ -70,7 +77,7 @@ Phd-A2/
 ├── results/
 │   ├── juliet/
 │   └── primevul/
-└── datasets/   (generated locally, usually not committed)
+└── datasets/   (juliet, primevul, benchmarks/ — local; see Scope)
 ```
 
 ### Must-Keep Core Representation Files
